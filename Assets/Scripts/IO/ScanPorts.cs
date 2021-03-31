@@ -6,6 +6,10 @@ using System.IO.Ports;
 
 public class ScanPorts : MonoBehaviour
 {
+    public string USBportName;
+    public static int baudrate = 57600;
+
+    [Space]
     public ArduinoConnect arduinoConnect;
     public TalkToArduino talkToArduino;
     [HideInInspector]
@@ -59,14 +63,14 @@ public class ScanPorts : MonoBehaviour
             if (talkToArduino.GotHandShake)
             {
                 //found port... do connect
-                PortData.Current.USBportName = item;
+                USBportName = item;
                 NoPortYet = false;
 
-                Debug.Log("<color=green>" + "Arduino port is: " + PortData.Current.USBportName + "</color>\n");
+                Debug.Log("<color=green>" + "Arduino port is: " + USBportName + "</color>\n");
 
                 talkToArduino.StartTalkingToArduino();
 
-                break;
+                yield break;
             }
             yield return new WaitForSeconds(0.5f);
         }
@@ -95,7 +99,7 @@ public class ScanPorts : MonoBehaviour
                 {
                     usbPortNames.Add(dev);
                 }
-				yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
             }
         }
         else

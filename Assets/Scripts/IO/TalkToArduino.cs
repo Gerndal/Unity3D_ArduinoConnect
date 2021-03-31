@@ -96,28 +96,27 @@ public class TalkToArduino : MonoBehaviour
         {
             case 'A':
                 Debug.Log("<color=red>" + "A: " + result + "</color>\n");
-				Camera.main.GetComponent <Camera> ().backgroundColor = Color.red;
+                Camera.main.GetComponent<Camera>().backgroundColor = Color.red;
                 break;
 
             case 'B':
                 Debug.Log("<color=orange>" + "B: " + result + "</color>\n");
-				Camera.main.GetComponent <Camera> ().backgroundColor = new Color(1, 0.65f, 0);
+                Camera.main.GetComponent<Camera>().backgroundColor = new Color(1, 0.65f, 0);
                 break;
 
             case 'C':
                 Debug.Log("<color=yellow>" + "C: " + result + "</color>\n");
-				Camera.main.GetComponent <Camera> ().backgroundColor = Color.yellow;
+                Camera.main.GetComponent<Camera>().backgroundColor = Color.yellow;
                 break;
 
             case 'H':
                 Debug.Log("<color=grey>" + "Cathed a spare handshake " + "</color>\n");
-				Camera.main.GetComponent <Camera> ().backgroundColor = Color.gray;
+                Camera.main.GetComponent<Camera>().backgroundColor = Color.gray;
                 break;
 
             default:
                 Debug.LogError("Case not found: " + sensorReading);
                 break;
         }
-
     }
 }

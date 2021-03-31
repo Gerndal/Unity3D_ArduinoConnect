@@ -9,7 +9,7 @@ public class ArduinoConnect : MonoBehaviour
 
     public void Open(string portName)
     {
-        stream = new SerialPort(portName, PortData.Current.baudrate, Parity.None, 8, StopBits.One);
+        stream = new SerialPort(portName, ScanPorts.baudrate, Parity.None, 8, StopBits.One);
         stream.ReadTimeout = 50;
         stream.Open();
     }
