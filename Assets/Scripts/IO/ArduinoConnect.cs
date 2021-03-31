@@ -7,9 +7,9 @@ public class ArduinoConnect : MonoBehaviour
 {
     private SerialPort stream;
 
-    public void Open(string portName)
+    public void Open(string _portName, int _baudrate)
     {
-        stream = new SerialPort(portName, ScanPorts.baudrate, Parity.None, 8, StopBits.One);
+        stream = new SerialPort(_portName, _baudrate, Parity.None, 8, StopBits.One);
         stream.ReadTimeout = 50;
         stream.Open();
     }
@@ -72,8 +72,6 @@ public class ArduinoConnect : MonoBehaviour
             diff = nowTime - initialTime;
 
         } while (diff.Milliseconds < timeout);
-
-        yield return null;
     }
 
     void OnApplicationQuit()

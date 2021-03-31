@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TalkToArduino : MonoBehaviour
+public class TalkToArduino: MonoBehaviour
 {
     //connect class
     public ArduinoConnect arduinoConnect;
 
     //call sensor readings on Arduino
-    string[] sensorChars = { "A\n", "B\n", "C\n" };
-    int sensorIndex = 0;
+    public  string[] sensorChars = { "A", "B", "C" };
+    private string strEnd        = "\n";
+    private int sensorIndex      = 0;
 
     const float Frequency = 0.1f;
 
@@ -23,14 +24,14 @@ public class TalkToArduino : MonoBehaviour
 
     public void SendSensorIndexToArduino()
     {
-        arduinoConnect.WriteToArduino(sensorChars[(sensorIndex++) % sensorChars.Length]);
+        arduinoConnect.WriteToArduino(sensorChars[(sensorIndex++) % sensorChars.Length] + strEnd);
         StartCoroutine(arduinoConnect.AsynchronousReadFromArduino(s => CheckCallback(s), Frequency));
     }
 
     public IEnumerator SendHandshake()
     {
         Debug.Log("<color=green>" + "handshake sent... waiting for reply" + "</color>\n");
-        arduinoConnect.WriteToArduino("GameIsland\n");
+        arduinoConnect.WriteToArduino("GameIsland" + strEnd);
 
         yield return arduinoConnect.AsynchronousReadFromArduino(s => CheckHandshake(s), Frequency);
     }
@@ -70,27 +71,27 @@ public class TalkToArduino : MonoBehaviour
 
         switch (sensorReading)
         {
-            case 'A':
+            case 'A': 
                 Debug.Log("<color=red>" + "A: " + result + "</color>\n");
                 Camera.main.GetComponent<Camera>().backgroundColor = Color.red;
                 break;
 
-            case 'B':
+            case 'B': 
                 Debug.Log("<color=orange>" + "B: " + result + "</color>\n");
                 Camera.main.GetComponent<Camera>().backgroundColor = new Color(1, 0.65f, 0);
                 break;
 
-            case 'C':
+            case 'C': 
                 Debug.Log("<color=yellow>" + "C: " + result + "</color>\n");
                 Camera.main.GetComponent<Camera>().backgroundColor = Color.yellow;
                 break;
 
-            case 'H':
+            case 'H': 
                 Debug.Log("<color=grey>" + "Cathed a spare handshake " + "</color>\n");
                 Camera.main.GetComponent<Camera>().backgroundColor = Color.gray;
                 break;
 
-            default:
+            default: 
                 Debug.LogError("Case not found: " + sensorReading);
                 break;
         }

@@ -1,22 +1,22 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO.Ports;
 
-public class ScanPorts : MonoBehaviour
+public class ScanPorts: MonoBehaviour
 {
-    public string USBportName;
-    public static int baudrate = 57600;
+    public string USB_PortName;
+    public int baudrate = 57600;
 
     [Space]
-    public ArduinoConnect arduinoConnect;
-    public TalkToArduino talkToArduino;
-    [HideInInspector]
-    public List<string> usbPortNames = new List<string>();
+    public  ArduinoConnect arduinoConnect;
+    public  TalkToArduino talkToArduino;
 
-    [HideInInspector]
-    bool NoPortYet = true;
+    private List<string> usbPortNames;
+    private bool NoPortYet = true;
 
     void Start()
     {
@@ -33,73 +33,51 @@ public class ScanPorts : MonoBehaviour
         Debug.Log("<color=green>" + "Scanning for arduino port" + "</color>\n");
 
         NoPortYet = true;
-
         while (NoPortYet)
         {
             yield return StartCoroutine(GetArduinoPort());
         }
-
-        yield return null;
     }
 
     public IEnumerator GetArduinoPort()
     {
-        //get fresh list of portnames
         yield return StartCoroutine(ScanUSBPortNames());
 
-        //set recieved handshake to false
-        NoPortYet = true;
-
-        //loop through ports looking for handshake
-        foreach (var item in usbPortNames)
+        foreach (var port in usbPortNames)
         {
-            //arduinoConnect
-            arduinoConnect.Open(item);
+            arduinoConnect.Open(port, baudrate);
             yield return StartCoroutine(talkToArduino.SendHandshake());
+            Debug.Log("<color=green>" + "Trying with port: " + port + "</color>\n");
 
-            Debug.Log("<color=green>" + "Trying with port: " + item + "</color>\n");
-
-            //got handshake is true
             if (talkToArduino.GotHandShake)
             {
-                //found port... do connect
-                USBportName = item;
-                NoPortYet = false;
+                USB_PortName = port;
+                NoPortYet    = false;
 
-                Debug.Log("<color=green>" + "Arduino port is: " + USBportName + "</color>\n");
-
+                Debug.Log("<color=green>" + "Arduino port is: " + USB_PortName + "</color>\n");
                 talkToArduino.StartTalkingToArduino();
-
                 yield break;
             }
             yield return new WaitForSeconds(0.5f);
         }
-        yield return null;
-    }
-
-    public IEnumerator ScanUSBPortNames()
-    {
-        //clear here...
-        usbPortNames.Clear();
-        yield return StartCoroutine(GetPortNames());
     }
 
     //list usb ports on mac
-    IEnumerator GetPortNames()
+    IEnumerator ScanUSBPortNames()
     {
-        int p = (int)System.Environment.OSVersion.Platform;
+            usbPortNames = new List<string>();
+        var p            = System.Environment.OSVersion.Platform;
 
         // Are we on Unix?
-        if (p == 4 || p == 128 || p == 6)
+        if ((p == PlatformID.Unix  ) ||
+            (p == PlatformID.MacOSX))
         {
             string[] ttys = System.IO.Directory.GetFiles("/dev/", "tty.*");
+            yield return new WaitForEndOfFrame();
+
             foreach (string dev in ttys)
             {
-                if (dev.StartsWith("/dev/tty."))
-                {
-                    usbPortNames.Add(dev);
-                }
-                yield return new WaitForEndOfFrame();
+                if (dev.StartsWith("/dev/tty.")) usbPortNames.Add(dev);
             }
         }
         else
