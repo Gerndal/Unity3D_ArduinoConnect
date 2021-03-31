@@ -42,7 +42,7 @@ public class TalkToArduino : MonoBehaviour
 
         yield return arduinoConnect.AsynchronousReadFromArduino
             ((string s) => CheckHandshake(s),     // Callback
-                1000000                       // Timeout (seconds)
+                Frequency                       // Timeout (seconds)
             );
     }
 

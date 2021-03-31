@@ -44,18 +44,14 @@ public class ScanPorts : MonoBehaviour
         yield return StartCoroutine(ScanUSBPortNames());
 
         //set recieved handshake to false
-        NoPortYet = false;
+        NoPortYet = true;
 
         //loop through ports looking for handshake
         foreach (var item in usbPortNames)
         {
             //arduinoConnect
-            Debug.Log(item);
             arduinoConnect.Open(item);
-			while (talkToArduino.GotHandShake == false)
-			{
-				yield return StartCoroutine(talkToArduino.SendHandshake());
-			}
+            yield return StartCoroutine(talkToArduino.SendHandshake());
 
             Debug.Log("<color=green>" + "Trying with port: " + item + "</color>\n");
 

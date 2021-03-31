@@ -64,7 +64,7 @@ public class ArduinoConnect : MonoBehaviour
             if (dataString != null)
             {
                 callback(dataString);
-                yield break;
+                yield return null;
             }
             else
                 yield return new WaitForSeconds(0.05f);
