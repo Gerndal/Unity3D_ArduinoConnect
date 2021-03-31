@@ -336,6 +336,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arduinoConnect: {fileID: 613039320}
+  sensorChars:
+  - 'A
+
+'
+  - 'B
+
+'
+  - 'C
+
+'
   GotHandShake: 0
 --- !u!1 &912671759
 GameObject:
@@ -380,10 +390,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e10e6cdb04544161933f20aff5ad820, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  USBportName: 
+  USB_PortName: 
+  baudrate: 57600
   arduinoConnect: {fileID: 613039320}
   talkToArduino: {fileID: 717711216}
-  usbPortNames: []
 --- !u!850595691 &1490240108
 LightingSettings:
   m_ObjectHideFlags: 0

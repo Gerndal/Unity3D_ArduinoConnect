@@ -16,7 +16,6 @@ public class ArduinoConnect : MonoBehaviour
 
     public void WriteToArduino(string message)
     {
-        // Send the request
         try
         {
             stream.WriteLine(message);
@@ -44,7 +43,6 @@ public class ArduinoConnect : MonoBehaviour
     public IEnumerator AsynchronousReadFromArduino(Action<string> callback, float timeout = float.PositiveInfinity)
     {
         DateTime initialTime = DateTime.Now;
-        DateTime nowTime;
         TimeSpan diff = default(TimeSpan);
 
         string dataString = null;
@@ -61,16 +59,11 @@ public class ArduinoConnect : MonoBehaviour
             }
 
             if (dataString != null)
-            {
                 callback(dataString);
-                yield return null;
-            }
-            else
-                yield return new WaitForSeconds(0.05f);
+            
+            yield return new WaitForEndOfFrame();
 
-            nowTime = DateTime.Now;
-            diff = nowTime - initialTime;
-
+            diff = DateTime.Now - initialTime;
         } while (diff.Milliseconds < timeout);
     }
 
