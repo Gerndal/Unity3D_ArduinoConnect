@@ -3,115 +3,121 @@ using System.Collections;
 
 public class TalkToArduino : MonoBehaviour
 {
-	//connect class
-	public ArduinoConnect arduinoConnect;
+    //connect class
+    public ArduinoConnect arduinoConnect;
 
-	//call sensor readings on Arduino
-	string[] sensorChars = { "A", "B", "C" };
-	int sensorIndex = 0;
+    //call sensor readings on Arduino
+    string[] sensorChars = { "A", "B", "C" };
+    int sensorIndex = 0;
 
-	const float Frequency = 0.02f;
+    const float Frequency = 0.1f;
 
-	[HideInInspector]
-	public bool GotHandShake = false;
+    [HideInInspector]
+    public bool GotHandShake = false;
 
-	public void StartTalkingToArduino ()
-	{
-		ArduinoConnectController.Current.ArduinoIsConnected ();
-		arduinoConnect.Open (PortData.Current.USBportName);
-		InvokeRepeating ("SendSensorIndexToArduino", Frequency, Frequency);
-	}
+    public void StartTalkingToArduino()
+    {
+        ArduinoConnectController.Current.ArduinoIsConnected();
+        //arduinoConnect.Open (PortData.Current.USBportName);
+        InvokeRepeating("SendSensorIndexToArduino", Frequency, Frequency);
+    }
 
-	public void SendSensorIndexToArduino ()
-	{
-		arduinoConnect.WriteToArduino (sensorChars [UpdateSensorIndex ()]);
+    public void SendSensorIndexToArduino()
+    {
+        arduinoConnect.WriteToArduino(sensorChars[UpdateSensorIndex()]);
 
-		StartCoroutine
-		(
-			arduinoConnect.AsynchronousReadFromArduino
-			((string s) => CheckCallback (s),     // Callback
-				Frequency	                      // Timeout (seconds)
-			)
-		);
-	}
+        StartCoroutine
+        (
+            arduinoConnect.AsynchronousReadFromArduino
+            ((string s) => CheckCallback(s),     // Callback
+                Frequency                         // Timeout (seconds)
+            )
+        );
+    }
 
-	public IEnumerator SendHandshake ()
-	{
-		Debug.Log ("<color=green>" + "handshake sent... waiting for reply" + "</color>\n");
-		arduinoConnect.WriteToArduino ("H");
+    public IEnumerator SendHandshake()
+    {
+        Debug.Log("<color=green>" + "handshake sent... waiting for reply" + "</color>\n");
+        arduinoConnect.WriteToArduino("H");
 
-		yield return StartCoroutine
-		(
-			arduinoConnect.AsynchronousReadFromArduino
-			((string s) => CheckHandshake (s),     // Callback
-				Frequency	                      // Timeout (seconds)
-			)
-		);
-	}
+        yield return arduinoConnect.AsynchronousReadFromArduino
+            ((string s) => CheckHandshake(s),     // Callback
+                1000000                       // Timeout (seconds)
+            );
+    }
 
-	int UpdateSensorIndex ()
-	{
-		sensorIndex++;
-		if (sensorIndex >= sensorChars.Length) {
-			sensorIndex = 0;
-		}
-		return sensorIndex;
-	}
+    int UpdateSensorIndex()
+    {
+        sensorIndex++;
+        if (sensorIndex >= sensorChars.Length)
+        {
+            sensorIndex = 0;
+        }
+        return sensorIndex;
+    }
 
-	void CheckHandshake (string str)
-	{
-		Debug.Log (str);
-		if (str [0].ToString () == "H") {
-			Debug.Log ("H it is...");
-			GotHandShake = true;
-		}
-	}
+    void CheckHandshake(string str)
+    {
+        Debug.Log(str);
+        if (str[0].ToString() == "H")
+        {
+            Debug.Log("H it is...");
+            GotHandShake = true;
+        }
+    }
 
-	void CheckCallback (string str)
-	{
-		char sensorReading = str [0];
+    void CheckCallback(string str)
+    {
+        char sensorReading = str[0];
 
-		int result = -1;
-		int.TryParse (str.Substring (1), out result);
+        int result = -1;
+        int.TryParse(str.Substring(1), out result);
 
-		//if garbage - return
-		if (result == -1) {
-			return;
-		}
+        //if garbage - return
+        if (result == -1)
+        {
+            return;
+        }
 
-		//clean up data
-		if (result < 0) {
-			Debug.Log ("<color=red>" + "Data not clean" + "</color>\n");
-			result = 0;
-		}
+        //clean up data
+        if (result < 0)
+        {
+            Debug.Log("<color=red>" + "Data not clean" + "</color>\n");
+            result = 0;
+        }
 
-		if (result > 1024) {
-			Debug.Log ("<color=red>" + "Data not clean" + "</color>\n");
-			result = 1024;
-		}
+        if (result > 1024)
+        {
+            Debug.Log("<color=red>" + "Data not clean" + "</color>\n");
+            result = 1024;
+        }
 
-		switch (sensorReading) {
+        switch (sensorReading)
+        {
+            case 'A':
+                Debug.Log("<color=red>" + "A: " + result + "</color>\n");
+				Camera.main.GetComponent <Camera> ().backgroundColor = Color.red;
+                break;
 
-		case 'A':
-			Debug.Log ("<color=red>" + "A: " + result + "</color>\n");
-			break;
-		
-		case 'B':
-			Debug.Log ("<color=orange>" + "B: " + result + "</color>\n");
-			break;
-		
-		case 'C':
-			Debug.Log ("<color=yellow>" + "C: " + result + "</color>\n");
-			break;
-		
-		case 'H':
-			Debug.Log ("<color=grey>" + "Cathed a spare handshake " + "</color>\n");
-			break;
+            case 'B':
+                Debug.Log("<color=orange>" + "B: " + result + "</color>\n");
+				Camera.main.GetComponent <Camera> ().backgroundColor = new Color(1, 0.65f, 0);
+                break;
 
-		default:
-			Debug.LogError ("Case not found: " + sensorReading);
-			break;
-		}
+            case 'C':
+                Debug.Log("<color=yellow>" + "C: " + result + "</color>\n");
+				Camera.main.GetComponent <Camera> ().backgroundColor = Color.yellow;
+                break;
 
-	}
+            case 'H':
+                Debug.Log("<color=grey>" + "Cathed a spare handshake " + "</color>\n");
+				Camera.main.GetComponent <Camera> ().backgroundColor = Color.gray;
+                break;
+
+            default:
+                Debug.LogError("Case not found: " + sensorReading);
+                break;
+        }
+
+    }
 }
