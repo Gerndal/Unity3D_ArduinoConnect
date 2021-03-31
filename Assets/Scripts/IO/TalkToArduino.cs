@@ -7,7 +7,7 @@ public class TalkToArduino : MonoBehaviour
     public ArduinoConnect arduinoConnect;
 
     //call sensor readings on Arduino
-    string[] sensorChars = { "A", "B", "C" };
+    string[] sensorChars = { "A\n", "B\n", "C\n" };
     int sensorIndex = 0;
 
     const float Frequency = 0.1f;
@@ -17,53 +17,29 @@ public class TalkToArduino : MonoBehaviour
 
     public void StartTalkingToArduino()
     {
-        ArduinoConnectController.Current.ArduinoIsConnected();
-        //arduinoConnect.Open (PortData.Current.USBportName);
+		Camera.main.GetComponent <Camera> ().backgroundColor = Color.green;
         InvokeRepeating("SendSensorIndexToArduino", Frequency, Frequency);
     }
 
     public void SendSensorIndexToArduino()
     {
-        arduinoConnect.WriteToArduino(sensorChars[UpdateSensorIndex()]);
-
-        StartCoroutine
-        (
-            arduinoConnect.AsynchronousReadFromArduino
-            ((string s) => CheckCallback(s),     // Callback
-                Frequency                         // Timeout (seconds)
-            )
-        );
+        arduinoConnect.WriteToArduino(sensorChars[(sensorIndex++) % sensorChars.Length]);
+        StartCoroutine(arduinoConnect.AsynchronousReadFromArduino(s => CheckCallback(s), Frequency));
     }
 
     public IEnumerator SendHandshake()
     {
         Debug.Log("<color=green>" + "handshake sent... waiting for reply" + "</color>\n");
-        arduinoConnect.WriteToArduino("H");
+        arduinoConnect.WriteToArduino("GameIsland\n");
 
-        yield return arduinoConnect.AsynchronousReadFromArduino
-            ((string s) => CheckHandshake(s),     // Callback
-                Frequency                       // Timeout (seconds)
-            );
-    }
-
-    int UpdateSensorIndex()
-    {
-        sensorIndex++;
-        if (sensorIndex >= sensorChars.Length)
-        {
-            sensorIndex = 0;
-        }
-        return sensorIndex;
+        yield return arduinoConnect.AsynchronousReadFromArduino(s => CheckHandshake(s), Frequency);
     }
 
     void CheckHandshake(string str)
     {
         Debug.Log(str);
-        if (str[0].ToString() == "H")
-        {
-            Debug.Log("H it is...");
+        if (str == "GameIsland")
             GotHandShake = true;
-        }
     }
 
     void CheckCallback(string str)

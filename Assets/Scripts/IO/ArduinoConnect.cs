@@ -28,18 +28,18 @@ public class ArduinoConnect : MonoBehaviour
         }
     }
 
-    public string ReadFromArduino(int timeout = 0)
-    {
-        stream.ReadTimeout = timeout;
-        try
-        {
-            return stream.ReadLine();
-        }
-        catch (TimeoutException)
-        {
-            return null;
-        }
-    }
+    // public string ReadFromArduino(int timeout = 0)
+    // {
+    //     stream.ReadTimeout = timeout;
+    //     try
+    //     {
+    //         return stream.ReadLine();
+    //     }
+    //     catch (TimeoutException)
+    //     {
+    //         return null;
+    //     }
+    // }
 
     public IEnumerator AsynchronousReadFromArduino(Action<string> callback, float timeout = float.PositiveInfinity)
     {
@@ -48,7 +48,6 @@ public class ArduinoConnect : MonoBehaviour
         TimeSpan diff = default(TimeSpan);
 
         string dataString = null;
-
         do
         {
             // A single read attempt
@@ -72,7 +71,6 @@ public class ArduinoConnect : MonoBehaviour
             nowTime = DateTime.Now;
             diff = nowTime - initialTime;
 
-            yield return new WaitForEndOfFrame();
         } while (diff.Milliseconds < timeout);
 
         yield return null;

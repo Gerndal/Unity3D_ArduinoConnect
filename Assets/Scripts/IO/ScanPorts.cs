@@ -18,7 +18,7 @@ public class ScanPorts : MonoBehaviour
     [HideInInspector]
     bool NoPortYet = true;
 
-    public void StartScan()
+    void Start()
     {
         StartCoroutine(ScanForArduinoPort());
     }
