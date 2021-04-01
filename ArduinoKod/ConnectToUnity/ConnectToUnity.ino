@@ -1,13 +1,9 @@
-/*
- * Blink
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
- */
+#include <Arduino.h>
 
 int ledPin[3] = {3, 5, 6};
 int buttonPin[3] = {9, 10, 11};
 String retStr[3] = {"A", "B", "C"};
-bool  idDown[3] = {false, false, false};
+bool idDown[3] = {false, false, false};
 
 void IO_Initialize();
 void Connection();
@@ -26,37 +22,6 @@ void loop()
 
     for (int i = 0; i < 3; ++i) ButtonCheck(i);
     delay(2);
-}
-
-void IO_Initialize()
-{
-    for (int i = 0; i < 3; ++i) 
-    {
-        pinMode(ledPin[i], OUTPUT);
-        pinMode(buttonPin[i], INPUT_PULLUP);
-    }
-}
-
-void Connection()
-{
-    Serial.begin(57600);
-
-    while (!Serial);
-    Serial.println("Serial Connected");
-}
-
-void Handshake()
-{
-    String str = "";
-    while (Serial.available() > 0)
-    {
-        str = Serial.readStringUntil('\n');
-    }
-
-    if (str == "GameIsland")
-    {
-        Serial.println(String("GameIsland"));
-    }
 }
 
 void ButtonCheck(int _btnIdx)
@@ -79,3 +44,35 @@ void ButtonCheck(int _btnIdx)
         idDown[idex] = false;
     }
 }
+
+void Handshake()
+{
+    String str = "";
+    while (Serial.available() > 0)
+    {
+        str = Serial.readStringUntil('\n');
+    }
+
+    if (str == "GameIsland")
+    {
+        Serial.println(String("GameIsland"));
+    }
+}
+
+void Connection()
+{
+    Serial.begin(57600);
+
+    while (!Serial);
+    Serial.println("Serial Connected");
+}
+
+void IO_Initialize()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        pinMode(ledPin[i], OUTPUT);
+        pinMode(buttonPin[i], INPUT_PULLUP);
+    }
+}
+
