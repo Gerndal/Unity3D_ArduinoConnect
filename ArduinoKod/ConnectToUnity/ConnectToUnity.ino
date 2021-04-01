@@ -1,50 +1,81 @@
-//pins
-int analogPin0 = 0;
-int analogPin1 = 1;
-int analogPin2 = 2;
+/*
+ * Blink
+ * Turns on an LED on for one second,
+ * then off for one second, repeatedly.
+ */
 
-//vars
-int val = 0; // variable to store the value read
-byte incomingByte;
-String str;
+int ledPin[3] = {3, 5, 6};
+int buttonPin[3] = {9, 10, 11};
+String retStr[3] = {"A", "B", "C"};
+bool  idDown[3] = {false, false, false};
+
+void IO_Initialize();
+void Connection();
+void Handshake();
+void ButtonCheck(int _button);
 
 void setup()
 {
-    Serial.begin(57600);
-
-    while (!Serial);
-    Serial.println("found serial");
+    IO_Initialize();
+    Connection();
 }
 
 void loop()
 {
-    str = "";
+    Handshake();
+
+    for (int i = 0; i < 3; ++i) ButtonCheck(i);
+    delay(2);
+}
+
+void IO_Initialize()
+{
+    for (int i = 0; i < 3; ++i) 
+    {
+        pinMode(ledPin[i], OUTPUT);
+        pinMode(buttonPin[i], INPUT_PULLUP);
+    }
+}
+
+void Connection()
+{
+    Serial.begin(57600);
+
+    while (!Serial);
+    Serial.println("Serial Connected");
+}
+
+void Handshake()
+{
+    String str = "";
     while (Serial.available() > 0)
     {
         str = Serial.readStringUntil('\n');
     }
 
-    if (str == "A")
-    { //A
-        val = analogRead(analogPin0);
-        Serial.println(String("A") + val);
-        Serial.flush();
-    }
-    else if (str == "B")
-    { //B
-        val = analogRead(analogPin1);
-        Serial.println(String("B") + val);
-        Serial.flush();
-    }
-    else if (str == "C")
-    { //C
-        val = analogRead(analogPin2);
-        Serial.println(String("C") + val);
-        Serial.flush();
-    }
-    else if (str == "GameIsland")
-    { //H -> handshake
+    if (str == "GameIsland")
+    {
         Serial.println(String("GameIsland"));
-        Serial.flush();
+    }
+}
+
+void ButtonCheck(int _btnIdx)
+{
+    int idex = buttonPin[_btnIdx] - buttonPin[0];
+    if (digitalRead(buttonPin[_btnIdx]) == LOW)
+    {
+        if (idDown[idex] == true) return;
+
+        digitalWrite(ledPin[idex], HIGH);
+        Serial.println(retStr[idex]);
+        idDown[idex] = true;
+    }
+    else
+    {
+        if (idDown[idex] == false) return;
+
+        digitalWrite(ledPin[idex], LOW);
+        Serial.println("");
+        idDown[idex] = false;
     }
 }

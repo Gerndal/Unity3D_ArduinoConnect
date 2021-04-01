@@ -69,6 +69,7 @@ public class ArduinoConnect : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        Debug.Log("OnApplicationQuit");
         stream.Close();
     }
 }

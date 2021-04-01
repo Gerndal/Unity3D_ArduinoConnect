@@ -9,7 +9,7 @@ using System.IO.Ports;
 public class ScanPorts: MonoBehaviour
 {
     public string USB_PortName;
-    public int baudrate = 57600;
+    public int baudrate = 76800;
 
     [Space]
     public  ArduinoConnect arduinoConnect;
